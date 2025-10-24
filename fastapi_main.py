@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import router
 from api.line_webhook import router as line_router
+from api.cron_service import router as cron_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -24,6 +25,7 @@ app.add_middleware(
 # Include routes
 app.include_router(router)
 app.include_router(line_router, prefix="/line")
+app.include_router(cron_router, prefix="/cron")
 
 if __name__ == "__main__":
     import uvicorn
