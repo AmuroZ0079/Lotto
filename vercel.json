@@ -1,23 +1,14 @@
 {
-  "version": 2,
   "builds": [
     {
-      "src": "api/*.py",
+      "src": "fastapi_main.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/(.*)",
+      "dest": "/fastapi_main.py"
     }
-  ],
-  "env": {
-    "PYTHON_VERSION": "3.9"
-  },
-  "functions": {
-    "api/*.py": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
