@@ -17,21 +17,38 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET) if LINE_CHANNEL_SECRET else None
 
 router = APIRouter()
 
+@router.get("/status", tags=["LINE Bot"])
+async def line_bot_status():
+    """Check LINE Bot configuration status"""
+    return {
+        "line_bot_configured": bool(LINE_CHANNEL_ACCESS_TOKEN and LINE_CHANNEL_SECRET),
+        "access_token_set": bool(LINE_CHANNEL_ACCESS_TOKEN),
+        "channel_secret_set": bool(LINE_CHANNEL_SECRET),
+        "bot_api_initialized": bool(line_bot_api),
+        "webhook_handler_initialized": bool(handler)
+    }
+
 @router.post("/webhook", tags=["LINE Bot"])
 async def line_webhook(request: Request):
     """LINE Bot webhook endpoint"""
-    if not line_bot_api or not handler:
-        raise HTTPException(status_code=500, detail="LINE Bot not configured")
-
-    signature = request.headers.get('X-Line-Signature', '')
-    body = await request.body()
-
     try:
-        handler.handle(body.decode('utf-8'), signature)
-    except InvalidSignatureError:
-        raise HTTPException(status_code=400, detail="Invalid signature")
+        if not LINE_CHANNEL_ACCESS_TOKEN or not LINE_CHANNEL_SECRET:
+            return {"status": "LINE Bot not configured"}
 
-    return {"status": "OK"}
+        if not line_bot_api or not handler:
+            return {"status": "LINE Bot not initialized"}
+
+        signature = request.headers.get('X-Line-Signature', '')
+        body = await request.body()
+
+        handler.handle(body.decode('utf-8'), signature)
+        return {"status": "OK"}
+
+    except InvalidSignatureError:
+        return {"status": "Invalid signature"}
+    except Exception as e:
+        print(f"Webhook error: {e}")
+        return {"status": "Error", "message": str(e)}
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
