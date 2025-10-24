@@ -33,10 +33,14 @@ async def root():
 @router.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
     """Health check endpoint"""
+    import os
+    supabase_url = os.getenv("SUPABASE_URL", "NOT_SET")
+    supabase_key = os.getenv("SUPABASE_KEY", "NOT_SET")
+
     return HealthResponse(
         status="healthy",
         timestamp=datetime.now().isoformat(),
-        service="lottery-api"
+        service=f"lottery-api (URL: {supabase_url[:20]}..., KEY: {supabase_key[:10]}...)"
     )
 
 
