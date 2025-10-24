@@ -6,3 +6,4 @@ beautifulsoup4
 supabase
 python-dotenv
 python-multipart
+line-bot-sdk

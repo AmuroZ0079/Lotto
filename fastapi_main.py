@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import router
+from api.line_webhook import router as line_router
 
 # Create FastAPI app
 app = FastAPI(
-    title="Thai Lottery API",
-    description="API for checking Thai lottery numbers with comprehensive prize information",
-    version="2.0.0",
+    title="Thai Lottery API with LINE Bot",
+    description="API for checking Thai lottery numbers with comprehensive prize information and LINE Bot integration",
+    version="2.1.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -22,6 +23,7 @@ app.add_middleware(
 
 # Include routes
 app.include_router(router)
+app.include_router(line_router, prefix="/line")
 
 if __name__ == "__main__":
     import uvicorn
